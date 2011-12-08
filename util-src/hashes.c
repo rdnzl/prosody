@@ -1,6 +1,7 @@
 /* Prosody IM
 -- Copyright (C) 2009-2010 Matthew Wild
 -- Copyright (C) 2009-2010 Waqas Hussain
+-- Copyright (C) 2004 luacrypt Alexandre Erwin Ittner
 -- 
 -- This project is MIT/X11 licensed. Please see the
 -- COPYING file in the source package for more information.
@@ -13,6 +14,8 @@
 * Lua library for sha1, sha256 and md5 hashes
 */
 
+#define _XOPEN_SOURCE
+#include <unistd.h>
 #include <string.h>
 
 #include "lua.h"
@@ -50,11 +53,43 @@ MAKE_HASH_FUNCTION(Lsha1, SHA1, 20)
 MAKE_HASH_FUNCTION(Lsha256, SHA256, 32)
 MAKE_HASH_FUNCTION(Lmd5, MD5, 16)
 
+static int Lcrypt(lua_State *L)
+{
+    const char *key;
+    const char *salt;
+
+    if(lua_gettop(L) != 2)
+    {
+        lua_pushstring(L, "Bad argument number");
+        lua_error(L);
+        return 1;
+    }
+
+    if((key = lua_tostring(L, 1)) == NULL)
+    {
+        lua_pushstring(L, "Bad key");
+        lua_error(L);
+        return 1;
+    }
+
+    if((salt = lua_tostring(L, 2)) == NULL)
+    {
+        lua_pushstring(L, "Bad salt");
+        lua_error(L);
+        return 1;
+    }
+
+    lua_pushstring(L, crypt(key, salt));
+    return 1;
+}
+
+
 static const luaL_Reg Reg[] =
 {
 	{ "sha1",	Lsha1	},
 	{ "sha256",	Lsha256	},
 	{ "md5",	Lmd5	},
+	{ "crypt",	Lcrypt	},
 	{ NULL,		NULL	}
 };
 

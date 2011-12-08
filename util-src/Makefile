@@ -6,6 +6,7 @@ LUA_INCDIR?=/usr/include/lua$(LUA_SUFFIX)
 LUA_LIB?=lua$(LUA_SUFFIX)
 IDN_LIB?=idn
 OPENSSL_LIB?=crypto
+CRYPT_LIB?=crypt
 CC?=gcc
 CXX?=g++
 LD?=gcc
@@ -29,7 +30,7 @@ encodings.so: encodings.o
 
 hashes.so: hashes.o
 	MACOSX_DEPLOYMENT_TARGET="10.3"; export MACOSX_DEPLOYMENT_TARGET;
-	$(CC) -o $@ $< $(LDFLAGS) -l$(OPENSSL_LIB)
+	$(CC) -o $@ $< $(LDFLAGS) -l$(OPENSSL_LIB) -l$(CRYPT_LIB)
 
 .c.o:
 	$(CC) $(CFLAGS) -I$(LUA_INCDIR) -c -o $@ $<
